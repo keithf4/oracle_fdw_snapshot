@@ -47,5 +47,7 @@ EXECUTE 'DELETE FROM ofdw.oracle_tbltranslation WHERE src_table = ' || quote_lit
     
 EXECUTE 'DROP FOREIGN TABLE ' || v_fdw_table;
 
+EXECUTE 'DROP TABLE IF EXISTS tmp_snapshot_destroy';
+
 END
 $_$;

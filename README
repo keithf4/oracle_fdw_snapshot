@@ -2,7 +2,7 @@ This set of functions is for creating materialized view snapshots on PostgreSQL 
 
 This was made to replace a replication system currently in place using dbi_link between an old Oracle 8i system and PostgreSQL 9.1. The Oracle setup file is only known for certain to work with 8i. If anyone else can supply setup files (or confirm this file works) for more modern versions of Oracle, that would be appreciated.
 
-NOTE: You will have to edit setup_pg.sql to set the FDW server name and the schema where the oracle view is located for your systems. Also, the oracle setup file is using the ALL_TAB_COLUMNS system view. This only shows columns for tables that are accessible to the Oracle user you are using. If you want to be able to see all columns for all ables, you can try DBA_TAB_COLUMNS instead, but you'll need special permissions set for the Oracle user.
+NOTE: You will have to edit setup_pg.sql to set the FDW server name and the schema where the oracle view is located for your systems. Also, the oracle setup file is using the ALL_TAB_COLUMNS system view. This only shows columns for tables that are accessible to the Oracle user you are using. If you want to be able to see all columns for all tables, you can try DBA_TAB_COLUMNS instead, but you'll need special permissions set for the Oracle user.
 
 create_oracle_fdw_table('OWNER.TABLENAME') - Function for creating an FDW table. If you comment out 'EXECUTE v_insert_sql' near the bottom, this function can be used as a standalone function for easily creating FDW tables.
 
