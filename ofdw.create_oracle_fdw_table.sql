@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION ofdw.create_oracle_fdw_table(text) RETURNS void
+CREATE OR REPLACE FUNCTION ofdw.create_oracle_fdw_table(p_source_table text, p_snap text) RETURNS void
     LANGUAGE plpgsql
     AS $_$
 DECLARE
@@ -37,7 +37,7 @@ FOR v_tbldef IN
         WHEN data_type = 'INTERVAL DAY TO SECOND' THEN 'interval'
         ELSE 'WTF->' || data_type END AS data_type 
         FROM ofdw.oracle_table_columns
-        WHERE owner || '.' || table_name = $1
+        WHERE owner || '.' || table_name = p_source_table
         ORDER BY column_id ASC LOOP
 
     IF v_tbldef.data_type ~ 'WTF' THEN
@@ -58,16 +58,19 @@ FOR v_tbldef IN
     
 END LOOP;
 
-IF v_dest_schema IS NULL OR v_dest_table IS NULL THEN
+IF v_src_schema IS NULL OR v_src_table IS NULL THEN
     RAISE EXCEPTION 'Source table does not exist (%)', $1;
 END IF;
-  
-EXECUTE 'SELECT count(1) FROM pg_namespace WHERE nspname = $1'
-    INTO v_check
-    USING v_dest_schema;
-    
-IF v_check = 0 THEN
-    RAISE EXCEPTION 'Destination schema % does not exist', v_dest_schema;
+
+-- Only need to check for destination if using snap functionality. Otherwise just create a plain foreign table  
+IF p_snap = 'SNAP' THEN
+    EXECUTE 'SELECT count(1) FROM pg_namespace WHERE nspname = $1'
+        INTO v_check
+        USING v_dest_schema;
+        
+    IF v_check = 0 THEN
+        RAISE EXCEPTION 'Destination schema % does not exist', v_dest_schema;
+    END IF;
 END IF;
 
 v_fdw_table := 'ofdw.' || v_dest_schema || '_' || v_dest_table;
@@ -79,13 +82,15 @@ RAISE NOTICE 'create sql: %', v_create_sql;
 
 EXECUTE v_create_sql;
 
-v_src_table := v_src_schema || '.' || v_src_table;
-v_dest_table := v_dest_schema || '.' || v_dest_table;
-  
-v_insert_sql := 'INSERT INTO ofdw.oracle_tbltranslation (src_table, dest_table, fdw_table) VALUES (' ||
-    quote_literal(v_src_table) || ', ' || quote_literal(v_dest_table) || ', ' || quote_literal(v_fdw_table) || ')';
-    
-EXECUTE v_insert_sql;
+IF p_snap = 'SNAP' THEN
+    v_src_table := v_src_schema || '.' || v_src_table;
+    v_dest_table := v_dest_schema || '.' || v_dest_table;
+      
+    v_insert_sql := 'INSERT INTO ofdw.oracle_tbltranslation (src_table, dest_table, fdw_table) VALUES (' ||
+        quote_literal(v_src_table) || ', ' || quote_literal(v_dest_table) || ', ' || quote_literal(v_fdw_table) || ')';
+        
+    EXECUTE v_insert_sql;
+END IF;
 
 END
 $_$;

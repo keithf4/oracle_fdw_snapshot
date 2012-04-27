@@ -4,7 +4,7 @@ This was made to replace a replication system currently in place using dbi_link 
 
 NOTE: You will have to edit setup_pg.sql to set the FDW server name and the schema where the oracle view is located for your systems. Also, the oracle setup file is using the ALL_TAB_COLUMNS system view. This only shows columns for tables that are accessible to the Oracle user you are using. If you want to be able to see all columns for all tables, you can try DBA_TAB_COLUMNS instead, but you'll need special permissions set for the Oracle user.
 
-create_oracle_fdw_table('OWNER.TABLENAME') - Function for creating an FDW table. If you comment out 'EXECUTE v_insert_sql' near the bottom, this function can be used as a standalone function for easily creating FDW tables.
+create_oracle_fdw_table('OWNER.TABLENAME', 'SNAP') - Function for creating an FDW table. The second parameter is for telling the function whether you want to actually use the foreign table for a snap job. Passing 'SNAP' will check to ensure local schemas exist and insert the nessary data into the translation table. Passing anything else (ex 'noSNAP'), will cause it to just create the foreign table and nothing else. Useful if you just want access to an Oracle table, but don't need the data locally.
 
 perform_snapshot('OWNER.TABLENAME') - Grabs the most recent data from Oracle. Will automatically create the needed snap tables and view if they don't exist yet.
 
