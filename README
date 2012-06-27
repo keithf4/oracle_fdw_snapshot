@@ -1,4 +1,4 @@
-This set of functions is for creating materialized view snapshots on PostgreSQL from an Oracle database using the Oracle Foreign Data Wrapper (http://oracle-fdw.projects.postgresql.org).
+This set of functions is for creating materialized view snapshots on PostgreSQL from an Oracle database using the Oracle Foreign Data Wrapper (http://oracle-fdw.projects.postgresql.org). Note that it now requires oracle_fdw v0.9.6 at minimum since LONG types are now supported.
 
 This was made to replace a replication system currently in place using dbi_link between an old Oracle 8i system and PostgreSQL 9.1. The Oracle setup file is only known for certain to work with 8i. If anyone else can supply setup files (or confirm this file works) for more modern versions of Oracle, that would be appreciated.
 

@@ -35,6 +35,8 @@ FOR v_tbldef IN
         WHEN data_type = 'TIMESTAMP WITH TIME ZONE' THEN 'timestamptz'
         WHEN data_type = 'INTERVAL YEAR TO MONTH' THEN 'interval'
         WHEN data_type = 'INTERVAL DAY TO SECOND' THEN 'interval'
+        WHEN data_type = 'LONG' THEN 'text'
+        WHEN data_type = 'LONG RAW' THEN 'bytea'
         ELSE 'WTF->' || data_type END AS data_type 
         FROM ofdw.oracle_table_columns
         WHERE owner || '.' || table_name = p_source_table
